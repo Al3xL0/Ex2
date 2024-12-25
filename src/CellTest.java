@@ -51,18 +51,18 @@ public class CellTest {
     @Test
     void testIsForm() {
         Cell[] good = {
-                new Cell("=0"),
-                new Cell("=1+3"),
-                new Cell("=-2"),
-                new Cell("=3"),
-                new Cell("=4")
+                new Cell("=((0))"),
+                new Cell("=(23)+2+1+(1+2)"),
+                new Cell("=(11)"),
+                new Cell("=(1)+1"),
+                new Cell("=5")
         };
         Cell[] bad = {
-                new Cell(" "),
                 new Cell("a"),
-                new Cell("b"),
-                new Cell("d"),
-                new Cell("9")
+                new Cell("=(a2"),
+                new Cell("="),
+                new Cell("=Aa"),
+                new Cell("=(1)+1)")
         };
         for(Cell cell : good) {
             assertTrue(cell.isForm(cell.getData()));

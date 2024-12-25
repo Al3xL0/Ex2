@@ -7,7 +7,7 @@ public class Cell {
         this.data = data;
     }
 
-    public static boolean isNumber(String text) {
+    public boolean isNumber(String text) {
         boolean ans = true;
         int i = 0;
         int charInAscii;
@@ -44,7 +44,59 @@ public class Cell {
         return ans;
     }
 
+    /*
+        The following function checks if given string is a formula using regex
+     */
     public boolean isForm(String form) {
+        boolean ans = true;
+        if(form.isEmpty()){ans=false; return ans;}
+        if(!form.startsWith("=")){ans=false; return ans;}
+        form = form.substring(1);
+
+        String[] partsOfForm = form.split("[+\\-*/]");
+        String[] validPartsOfForm = new String[partsOfForm.length];
+
+        boolean leftParentheses, rightParentheses, wrappedByParentheses;
+        for(int i =0; i<partsOfForm.length; i++) {
+            leftParentheses = partsOfForm[i].startsWith("(");
+            rightParentheses = partsOfForm[i].endsWith(")");
+
+            if(i+1< partsOfForm.length ) {
+                wrappedByParentheses = partsOfForm[i+1].startsWith("(") && partsOfForm[i+1].endsWith(")");
+                if ( (!wrappedByParentheses) && leftParentheses && partsOfForm[i + 1].endsWith(")")) {
+                    validPartsOfForm[i] = partsOfForm[i].substring(1);
+                }
+            }
+
+            if(i-1 >= 0) {
+                wrappedByParentheses = partsOfForm[i-1].startsWith("(") && partsOfForm[i-1].endsWith(")");
+                if ((!wrappedByParentheses) && partsOfForm[i-1].startsWith("(") && rightParentheses) {
+                    validPartsOfForm[i] = partsOfForm[i].substring(0, partsOfForm[i].length() - 1);
+                }
+            }
+            if(!leftParentheses && !rightParentheses) {
+                validPartsOfForm[i] = partsOfForm[i];
+            }
+            else if(leftParentheses && rightParentheses) {
+                    validPartsOfForm[i] = partsOfForm[i].substring(1, partsOfForm[i].length()-1);
+            }
+
+            if(validPartsOfForm[i] == null || validPartsOfForm[i].isEmpty()) {
+                ans=false;
+                break;
+            } else {
+                try {
+                    Double.parseDouble(validPartsOfForm[i]);
+                } catch(NumberFormatException e) {
+                    ans =false;
+                    break;
+                }
+            }
+        }
+        return ans;
+    }
+    /*
+      public boolean isForm(String form) {
         boolean ans = true;
         String current;
         if(!form.startsWith("=")) { ans=false; return ans;}
@@ -57,6 +109,7 @@ public class Cell {
         }
         return ans;
     }
+     */
     private boolean isOperator(String opr) {
         String validOperators = "%*+-";
         return validOperators.contains(opr);
