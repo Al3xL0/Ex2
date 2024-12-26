@@ -44,6 +44,37 @@ public class Cell {
         return ans;
     }
 
+    private String removeParentheses(String[] arr , int i ) {
+        boolean leftParentheses, rightParentheses, wrappedByParentheses;
+        leftParentheses = arr[i].startsWith("(");
+        rightParentheses = arr[i].endsWith(")");
+        String res = "";
+        if(i+1< arr.length ) {
+            wrappedByParentheses = arr[i+1].startsWith("(") && arr[i+1].endsWith(")");
+            if ( (!wrappedByParentheses) && leftParentheses && arr[i + 1].endsWith(")")) {
+                res = arr[i].substring(1);
+            }
+        }
+
+        if(i-1 >= 0) {
+            wrappedByParentheses = arr[i-1].startsWith("(") && arr[i-1].endsWith(")");
+            if ((!wrappedByParentheses) && arr[i-1].startsWith("(") && rightParentheses) {
+                res = arr[i].substring(0, arr[i].length() - 1);
+            }
+        }
+        if(!leftParentheses && !rightParentheses) {
+            res = arr[i];
+        }
+        else if(leftParentheses && rightParentheses) {
+            res = arr[i].substring(1, arr[i].length()-1);
+        }
+        leftParentheses = res.startsWith("(");
+        rightParentheses = res.endsWith(")");
+        if(leftParentheses || rightParentheses ) {
+            res = removeParentheses(new String[]{res}, 0);
+        }
+        return res;
+    }
     /*
         The following function checks if given string is a formula using regex
      */
@@ -58,28 +89,7 @@ public class Cell {
 
         boolean leftParentheses, rightParentheses, wrappedByParentheses;
         for(int i =0; i<partsOfForm.length; i++) {
-            leftParentheses = partsOfForm[i].startsWith("(");
-            rightParentheses = partsOfForm[i].endsWith(")");
-
-            if(i+1< partsOfForm.length ) {
-                wrappedByParentheses = partsOfForm[i+1].startsWith("(") && partsOfForm[i+1].endsWith(")");
-                if ( (!wrappedByParentheses) && leftParentheses && partsOfForm[i + 1].endsWith(")")) {
-                    validPartsOfForm[i] = partsOfForm[i].substring(1);
-                }
-            }
-
-            if(i-1 >= 0) {
-                wrappedByParentheses = partsOfForm[i-1].startsWith("(") && partsOfForm[i-1].endsWith(")");
-                if ((!wrappedByParentheses) && partsOfForm[i-1].startsWith("(") && rightParentheses) {
-                    validPartsOfForm[i] = partsOfForm[i].substring(0, partsOfForm[i].length() - 1);
-                }
-            }
-            if(!leftParentheses && !rightParentheses) {
-                validPartsOfForm[i] = partsOfForm[i];
-            }
-            else if(leftParentheses && rightParentheses) {
-                    validPartsOfForm[i] = partsOfForm[i].substring(1, partsOfForm[i].length()-1);
-            }
+            validPartsOfForm[i] = removeParentheses(partsOfForm, i);
 
             if(validPartsOfForm[i] == null || validPartsOfForm[i].isEmpty()) {
                 ans=false;
@@ -94,25 +104,6 @@ public class Cell {
             }
         }
         return ans;
-    }
-    /*
-      public boolean isForm(String form) {
-        boolean ans = true;
-        String current;
-        if(!form.startsWith("=")) { ans=false; return ans;}
-        for(int i =1 ; i<form.length(); i++) {
-            current = String.valueOf(form.charAt(i));
-            if(!(isNumber(current) || isOperator(current) )) {
-                ans=false;
-                break;
-            }
-        }
-        return ans;
-    }
-     */
-    private boolean isOperator(String opr) {
-        String validOperators = "%*+-";
-        return validOperators.contains(opr);
     }
 
     private double computeForm(String form) {
