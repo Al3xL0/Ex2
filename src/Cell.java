@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Cell {
     private String data;
@@ -5,6 +7,7 @@ public class Cell {
 
     public Cell(String data) {
         this.data = data;
+        this.value = 0;
     }
 
     public boolean isNumber(String text) {
@@ -22,6 +25,7 @@ public class Cell {
         }
         if(text.startsWith("-")) {
             i++;
+            if(i>=text.length()) {ans =false;}
         }
         for(i=i; i<text.length(); i++) {
             charInAscii = (int) text.charAt(i);
@@ -34,7 +38,7 @@ public class Cell {
 
     public boolean isText(String text) {
         boolean ans = true;
-        System.out.println(text);
+
         if(isNumber(text)) {
             ans=false;
         }
@@ -106,14 +110,90 @@ public class Cell {
         return ans;
     }
 
+    private int indexOfMainOp(String form) {
+        int index = 0;
+        int currentOrder = 2, previousOrder = 2;
+        boolean inParentheses=false, isCurrentNumber;
+        char current;
+        for(int i=0; i<form.length(); i++) {
+            current = form.charAt(i);
+            isCurrentNumber = isNumber(Character.toString(form.charAt(i)));
+            if(current == '(') {
+                inParentheses = true;
+                currentOrder = 2;
+            } else if(current == ')') {
+                inParentheses = false;
+                currentOrder = 2;
+            }
+            if(!inParentheses) {
+                if(current == '*' || current == '/') {
+                    currentOrder = 1;
+                } else if(current == '-' || current == '+') {
+                    currentOrder = 0;
+                }
+            }
+            if(!isCurrentNumber&& (currentOrder <= previousOrder)) {
+                previousOrder = currentOrder;
+                index = i;
+            }
+        }
+        return index;
+    }
+    private double calc(double a, char operator, double b) {
+        double res;
+        switch (operator) {
+            case '*':
+                res = a * b;
+                break;
+            case '/':
+                res = a/b;
+                break;
+            case '+':
+                res = a + b;
+                break;
+            case '-':
+                res = a - b;
+                break;
+            default:
+                res = 0;
+                break;
+        }
+        return res;
+    }
     private double computeForm(String form) {
-        return 0;
+        double res = 0;
+        String part1 , part2;
+        int operator_index;
+        char operator;
+        try {
+            if(form.startsWith("(")) {
+                form = form.substring(1);
+            }
+            if(form.endsWith(")")) {
+                form = form.substring(0, form.length()-1);
+            }
+            res = Double.parseDouble(form);
+        } catch(NumberFormatException e) {
+            operator_index = indexOfMainOp(form);
+            operator = form.charAt(operator_index);
+            part1 = form.substring(0, operator_index);
+            part2 = form.substring(operator_index+1).trim();
+
+            if (part1.isEmpty() || part2.isEmpty()) {
+                part1 = "0";
+                part2 = "1";
+            }
+            res = calc(computeForm(part1), operator  ,computeForm(part2));
+
+
+        }
+        return res;
     }
     // a protection layer to computeForm, makes sure that the value that passed into the function is a formula
-    public void calcForm(String form) {
-        if(isForm(form)) {
+    public void calcForm() {
+        if(isForm(this.data)) {
             // assign the result to value.
-            this.value = computeForm(form);
+            this.value = computeForm(this.data.substring(1));
             this.data = Double.toString(value);
         }
     }

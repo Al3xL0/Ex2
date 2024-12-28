@@ -71,4 +71,19 @@ public class CellTest {
             assertFalse(cell.isForm(cell.getData()));
         }
     }
+    @Test
+    void testComputeForm() {
+        Cell[] formulas = {
+                new Cell("=3+4+(5*6)"),
+                new Cell("=3+4-(5*6)"),
+                new Cell("=5*8+(1-1)")
+        };
+        int index = 0;
+        double[] wantedResults ={37, -23, 40  };
+        for(Cell formula : formulas) {
+            formula.calcForm();
+            assertEquals(formula.getValue(), wantedResults[index]);
+            index++;
+        }
+    }
 }
