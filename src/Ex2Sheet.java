@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 // Add your documentation below:
 
 public class Ex2Sheet implements Sheet {
@@ -25,7 +26,9 @@ public class Ex2Sheet implements Sheet {
         // Add your code here
 
         Cell c = get(x,y);
-        if(c!=null) {ans = c.toString();}
+        if(c!=null) {
+            ans = c.toString();
+        }
 
         /////////////////////
         return ans;
@@ -106,7 +109,46 @@ public class Ex2Sheet implements Sheet {
         String ans = null;
         if(get(x,y)!=null) {ans = get(x,y).toString();}
         // Add your code here
+        ArrayList<String> cellsInFormula = new ArrayList<String>();
+        double res;
+        // maybe useful
+        CellEntry current;
+        int validX , validY;
+        // ---
+        if(ans != null && table[x][y].isForm(ans)) {
+            // move that to isValid
+            for(String index: CellEntry.indexs) {
+                if(ans.contains(index)) {
+                    cellsInFormula.add(index);
+                }
+            }
+            if(cellsInFormula.isEmpty()) {
+                int type = table[x][y].getType();
+                if(type==3) {
+                    res = table[x][y].computeForm(ans);
+                    ans = Double.toString(res);
+                }
+            } else {
+                for(String cell : cellsInFormula) {
+                    /* current = new CellEntry(cell);
+                    / validX = current.getX();
+                    / validY = current.getY();
+                    / if(isIn(validX, validY))
+                      {
+                       celldata = eval(table[x][y].toString)
+                       if(table[x][y].isText(celldata)) {
+                         ans = Error formula
+                       } else {
+                         ans.replace(cell, celldata);
+                       }
 
+                      } else {
+                            error formula
+                      }
+                    */
+                }
+            }
+        }
         /////////////////////
         return ans;
         }

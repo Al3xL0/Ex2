@@ -38,4 +38,10 @@ public interface Cell {
      * @param t
      */
     public void setOrder(int t);
+
+    // my functions
+
+    public boolean isForm(String form);
+
+    public double computeForm(String form);
 }

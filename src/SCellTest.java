@@ -55,14 +55,16 @@ public class SCellTest {
                 new SCell("=(23)+2+1+(1+2)"),
                 new SCell("=(11)"),
                 new SCell("=(1)+1"),
-                new SCell("=(1+2)*((3))-1")
+                new SCell("=(1+2)*((3))-1"),
+                new SCell("=a0+b0")
         };
         SCell[] bad = {
                 new SCell("a"),
                 new SCell("=(a2"),
                 new SCell("=((1 + 1)"),
                 new SCell("=Aa"),
-                new SCell("=(1)+1)")
+                new SCell("=(1)+1)"),
+                new SCell("=*1")
         };
         for(SCell cell : good) {
             assertTrue(cell.isForm(cell.getData()));

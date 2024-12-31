@@ -162,8 +162,10 @@ public class SCell implements Cell {
                 try {
                     Double.parseDouble(validPartsOfForm[i]);
                 } catch(NumberFormatException e) {
-                    ans =false;
-                    break;
+                    if(!CellEntry.indexs.contains(validPartsOfForm[i])) {
+                        ans =false;
+                        break;
+                    }
                 }
             }
         }
@@ -220,7 +222,7 @@ public class SCell implements Cell {
         }
         return res;
     }
-    private double computeForm(String form) {
+    public double computeForm(String form) {
         double res = 0;
         String part1 , part2;
         int operator_index;
