@@ -59,7 +59,7 @@ public class SCellTest {
                 new SCell("=a0+b0")
         };
         SCell[] bad = {
-                new SCell("a"),
+                new SCell("=a"),
                 new SCell("=(a2"),
                 new SCell("=((1 + 1)"),
                 new SCell("=Aa"),
@@ -68,9 +68,12 @@ public class SCellTest {
         };
         for(SCell cell : good) {
             assertTrue(cell.isForm(cell.getData()));
+            assertEquals(cell.getType(),Ex2Utils.FORM);
         }
         for(SCell cell : bad) {
             assertFalse(cell.isForm(cell.getData()));
+            assertEquals(cell.getType(),Ex2Utils.ERR_FORM_FORMAT);
+            assertEquals(cell.getData(),Ex2Utils.ERR_FORM);
         }
     }
     @Test
@@ -78,10 +81,10 @@ public class SCellTest {
         SCell[] formulas = {
                 new SCell("=3+4+(5*6)"),
                 new SCell("=3+4-(5*6)"),
-                new SCell("=5*8+(1-1)")
+                new SCell("=3/3 - 1")
         };
         int index = 0;
-        double[] wantedResults ={37, -23, 40  };
+        double[] wantedResults ={37, -23, 0};
         for(SCell formula : formulas) {
             formula.calcForm();
             assertEquals(formula.getValue(), wantedResults[index]);

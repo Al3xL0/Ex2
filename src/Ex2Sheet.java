@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 // Add your documentation below:
 
 public class Ex2Sheet implements Sheet {
@@ -42,8 +44,16 @@ public class Ex2Sheet implements Sheet {
     @Override
     public Cell get(String cords) {
         Cell ans = null;
+        int x,y;
         // Add your code here
-
+        CellEntry wantedCell = new CellEntry(cords);
+        if(wantedCell.isValid()) {
+            x = wantedCell.getX();
+            y = wantedCell.getY();
+            if(isIn(x,y)) {
+                ans = table[x][y];
+            }
+        }
         /////////////////////
         return ans;
     }
@@ -61,7 +71,7 @@ public class Ex2Sheet implements Sheet {
         Cell c = new SCell(s);
         table[x][y] = c;
         // Add your code here
-
+        c.setData(s);
         /////////////////////
     }
     @Override
@@ -76,17 +86,62 @@ public class Ex2Sheet implements Sheet {
     public boolean isIn(int xx, int yy) {
         boolean ans = xx>=0 && yy>=0;
         // Add your code here
-
+        ans = ans && (xx<=width() && yy<= height());
         /////////////////////
         return ans;
+    }
+
+    private void cellDepth(int[][] depth, int i, int j, int current_depth) {
+        Cell currentCell = table[i][j];
+        int type = currentCell.getType();
+        String currentData = currentCell.getData(), regex;
+        CellEntry cellEntry;
+        int x,y, maxDepth = 0;
+        Pattern pattern;
+        Matcher matcher;
+        if(type == 3) {
+            current_depth++;
+            try {
+                currentCell.computeForm(currentData);
+            } catch(StringIndexOutOfBoundsException e) {
+                // find cells using regex
+                regex = "[A-Z]+[0-9]+";
+                pattern = Pattern.compile(regex);
+                matcher = pattern.matcher(currentData);
+                ArrayList<String> cellReferences = new ArrayList<>();
+                while (matcher.find()) {
+                    cellReferences.add(matcher.group()); // Add matched reference to the list
+                }
+                for(String cell : cellReferences) {
+                    cellEntry = new CellEntry(cell);
+                    x = cellEntry.getX();
+                    y = cellEntry.getY();
+                    if(isIn(x,y)) {
+                        cellDepth(depth, x,y , 0);
+                        if(depth[x][y] > maxDepth) {
+                            maxDepth = depth[x][y];
+                        }
+                    }
+                }
+            }
+        }
+        depth[i][j] = current_depth + maxDepth;
     }
 
     @Override
     public int[][] depth() {
         int[][] ans = new int[width()][height()];
-        // Add your code here
 
+        // Add your code here
+        for(int i = 0; i<ans.length; i++) {
+            for(int j = 0; j<ans[0].length; j++) {
+                if(ans[i][j] == 0) {
+                    cellDepth(ans,i,j,0);
+                }
+            }
+        }
         // ///////////////////
+
         return ans;
     }
 

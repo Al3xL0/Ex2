@@ -6,29 +6,21 @@ public class SCell implements Cell {
     // Add your code here
     private double value;
 
+    private int order;
 
 
     public SCell(String s) {
         // Add your code here
         setData(s);
 
-        if(isNumber(s)) {
-            type = Ex2Utils.NUMBER;
-        } else if(isForm(s)) {
-            type = Ex2Utils.FORM;
-        } else if(isText(s)) {
-            type = Ex2Utils.TEXT;
-        }  else {
-            type = Ex2Utils.ERR_FORM_FORMAT;
-            this.line = Ex2Utils.ERR_FORM;
-        }
+
     }
 
     @Override
     public int getOrder() {
         // Add your code here
 
-        return 0;
+        return order;
         // ///////////////////
     }
 
@@ -51,6 +43,16 @@ public class SCell implements Cell {
 
     @Override
     public int getType() {
+        if(isNumber(line)) {
+            type = Ex2Utils.NUMBER;
+        } else if(isForm(line)) {
+            type = Ex2Utils.FORM;
+        } else if(isText(line)) {
+            type = Ex2Utils.TEXT;
+        }  else {
+            type = Ex2Utils.ERR_FORM_FORMAT;
+            this.line = Ex2Utils.ERR_FORM;
+        }
         return type;
     }
 
@@ -66,7 +68,7 @@ public class SCell implements Cell {
     @Override
     public void setOrder(int t) {
         // Add your code here
-
+        order = t;
     }
 
     /*
@@ -173,13 +175,13 @@ public class SCell implements Cell {
     }
 
     private int indexOfMainOp(String form) {
-        int index = 0;
+        int index = -1;
         int currentOrder = 2, previousOrder = 2;
-        boolean inParentheses=false, isCurrentNumber;
+        boolean inParentheses=false, isCurrentNotOperator;
         char current;
         for(int i=0; i<form.length(); i++) {
             current = form.charAt(i);
-            isCurrentNumber = isNumber(Character.toString(form.charAt(i)));
+            isCurrentNotOperator = Character.isDigit(current) || Character.isLetter(current) ;
             if(current == '(') {
                 inParentheses = true;
                 currentOrder = 2;
@@ -194,7 +196,7 @@ public class SCell implements Cell {
                     currentOrder = 0;
                 }
             }
-            if(!isCurrentNumber&& (currentOrder <= previousOrder)) {
+            if(!isCurrentNotOperator&& (currentOrder <= previousOrder)) {
                 previousOrder = currentOrder;
                 index = i;
             }
