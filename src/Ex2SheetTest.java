@@ -21,19 +21,20 @@ public class Ex2SheetTest {
         Ex2Sheet sheet = new Ex2Sheet(3, 4);
         String[][] dataForSpreadSheet = {
                 {
-                    "1" , "=A0", "=1+2", "hey"
+                    "=1+2" , "=A0", "=1+2", "hey"
                 },
                 {
-                    "=A0", "=A0+A1", "text", "111"
+                    "=A0", "=A0+A1", "=B2", "=C3"
                 },
                 {
-                    "=(1+2)+A0", "=B0+A0", "=B1+A0+C1","hello"
+                    "=(1+2)+A0", "=B0+A0", "=B1+A0+C1","=B3"
                 }
         };
+        // fix case C3 :=C5 C5:=C3
         int[][] wantedDepth = {
-                {0,1,1,0},
-                {1,2,0,0},
-                {1,2,3,0}
+                {1,2,1,0},
+                {2,3,-1,-1},
+                {2,3,4,-1}
         };
         int[][] actualDepth = new int[3][4];
         for(int i=0; i<dataForSpreadSheet.length; i++) {

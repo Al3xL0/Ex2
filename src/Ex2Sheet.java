@@ -96,6 +96,7 @@ public class Ex2Sheet implements Sheet {
         int type = currentCell.getType();
         String currentData = currentCell.getData(), regex;
         CellEntry cellEntry;
+        CellEntry givenCellEntry = new CellEntry(i,j);
         int x,y, maxDepth = 0;
         Pattern pattern;
         Matcher matcher;
@@ -117,7 +118,17 @@ public class Ex2Sheet implements Sheet {
                     x = cellEntry.getX();
                     y = cellEntry.getY();
                     if(isIn(x,y)) {
-                        cellDepth(depth, x,y , 0);
+                        try {
+                            cellDepth(depth, x,y , 0);
+                        } catch(StackOverflowError infiniteCall){
+                            depth[x][y] = -1;
+                        }
+
+                        if(depth[x][y] == -1) {
+                            current_depth = -1;
+                            maxDepth = 0;
+                            break;
+                        }
                         if(depth[x][y] > maxDepth) {
                             maxDepth = depth[x][y];
                         }

@@ -8,6 +8,13 @@ public class CellEntry  implements Index2D {
     public CellEntry(String entry){
         this.indexOfCell = entry.toUpperCase();
     }
+    public CellEntry(int x, int y) {
+        this.indexOfCell = convert(x) + convert(y);
+    }
+    @Override
+    public String toString() {
+        return  this.indexOfCell;
+    }
     @Override
     public boolean isValid() {
         boolean ans = false;
@@ -53,5 +60,13 @@ public class CellEntry  implements Index2D {
         }
 
         return indexList;
+    }
+
+    private String convert(int num) {
+        if (num >= 0 && num < 26) {
+            return Character.toString((char) ('A' + num)); // Convert 0-25 to 'A'-'Z'
+        } else {
+            return Integer.toString(num); // Return the number as a string otherwise
+        }
     }
 }

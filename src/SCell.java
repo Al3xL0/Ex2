@@ -243,10 +243,7 @@ public class SCell implements Cell {
             part1 = form.substring(0, operator_index);
             part2 = form.substring(operator_index+1).trim();
 
-            if (part1.isEmpty() || part2.isEmpty()) {
-                part1 = "0";
-                part2 = "1";
-            }
+
             res = calc(computeForm(part1), operator  ,computeForm(part2));
 
 
