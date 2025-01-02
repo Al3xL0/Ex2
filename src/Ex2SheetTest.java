@@ -21,18 +21,18 @@ public class Ex2SheetTest {
         Ex2Sheet sheet = new Ex2Sheet(3, 4);
         String[][] dataForSpreadSheet = {
                 {
-                    "=1+2" , "=A0", "=1+2", "hey"
+                    "=A0" , "=A2", "=1+2", "hey"
                 },
                 {
-                    "=A0", "=A0+A1", "=B2", "=C3"
+                    "=A2", "=A2+A1", "=B2", "=C3"
                 },
                 {
-                    "=(1+2)+A0", "=B0+A0", "=B1+A0+C1","=B3"
+                    "=(1+2)+A2", "=B0+A2", "=B1+A2+C1","=B3"
                 }
         };
         // fix case C3 :=C5 C5:=C3
         int[][] wantedDepth = {
-                {1,2,1,0},
+                {-1,2,1,0},
                 {2,3,-1,-1},
                 {2,3,4,-1}
         };
@@ -48,6 +48,47 @@ public class Ex2SheetTest {
         }
         for (int i = 0; i < wantedDepth.length; i++) {
             assertArrayEquals(wantedDepth[i], actualDepth[i], "Row " + i + " did not match");
+        }
+    }
+    @Test
+    public void testEvalString() {
+        Ex2Sheet sheet = new Ex2Sheet(3, 4);
+        String[][] dataForSpreadSheet = {
+                {
+                        "=1+2" , "=A0", "=1+2", "hey"
+                },
+                {
+                        "=A0", "=A0+A1", "=B1+B3", "=5*8"
+                },
+                {
+                        "=(1+2)+A0", "=B0+A0", "=B1+A0+C1","=B3"
+                }
+        };
+        String[][] wantedDataAfterEval = {
+                {
+                        "3.0" , "3.0", "3.0", "hey"
+                },
+                {
+                        "3.0", "6.0", "46.0", "40.0"
+                },
+                {
+                        "6.0", "6.0", "15.0","40.0"
+                }
+        };
+        String[][] actualData = new String[3][4];
+        for(int i=0; i<dataForSpreadSheet.length; i++) {
+            for (int j=0; j<dataForSpreadSheet[i].length; j++) {
+                sheet.set(i,j,dataForSpreadSheet[i][j]);
+            }
+        }
+        for(int i=0; i<actualData.length; i++) {
+            for (int j=0; j<actualData[i].length; j++) {
+                actualData[i][j] = sheet.eval(i,j);
+            }
+            System.out.println("Row " + i + ": " + Arrays.toString(actualData[i]));
+        }
+        for (int i = 0; i < wantedDataAfterEval.length; i++) {
+            assertArrayEquals(wantedDataAfterEval[i], actualData[i], "Row " + i + " did not match");
         }
     }
 }

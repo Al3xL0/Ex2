@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 // Add your documentation below:
@@ -78,7 +79,19 @@ public class Ex2Sheet implements Sheet {
     public void eval() {
         int[][] dd = depth();
         // Add your code here
-
+        String res;
+        for(int i=0; i<width(); i++){
+            for(int j=0; j<height(); j++){
+                if(dd[i][j] != -1) {
+                    res = eval(i,j);
+                    table[i][j].setData(res);
+                    table[i][j].getType();
+                } else {
+                    table[i][j].setType(Ex2Utils.ERR_CYCLE_FORM);
+                    table[i][j].setData(Ex2Utils.ERR_CYCLE);
+                }
+            }
+        }
         // ///////////////////
     }
 
@@ -90,10 +103,21 @@ public class Ex2Sheet implements Sheet {
         /////////////////////
         return ans;
     }
-
+    private ArrayList<String> cellReferencesInForm(String form) {
+        String regex = "[A-Z]+[0-9]+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(form);
+        ArrayList<String> cellReferences = new ArrayList<>();
+        while (matcher.find()) {
+            cellReferences.add(matcher.group()); // Add matched reference to the list
+        }
+        return cellReferences;
+    }
     private void cellDepth(int[][] depth, int i, int j, int current_depth) {
         Cell currentCell = table[i][j];
-        int type = currentCell.getType();
+
+        int type = -1;
+        if(depth[i][j] != -1) {type = currentCell.getType();}
         String currentData = currentCell.getData(), regex;
         CellEntry cellEntry;
         CellEntry givenCellEntry = new CellEntry(i,j);
@@ -102,28 +126,30 @@ public class Ex2Sheet implements Sheet {
         Matcher matcher;
         if(type == 3) {
             current_depth++;
-            try {
-                currentCell.computeForm(currentData);
-            } catch(StringIndexOutOfBoundsException e) {
-                // find cells using regex
-                regex = "[A-Z]+[0-9]+";
-                pattern = Pattern.compile(regex);
-                matcher = pattern.matcher(currentData);
-                ArrayList<String> cellReferences = new ArrayList<>();
-                while (matcher.find()) {
-                    cellReferences.add(matcher.group()); // Add matched reference to the list
-                }
+
+            // find cells using regex
+
+            ArrayList<String> cellReferences = cellReferencesInForm(currentData);
+
+            if(!cellReferences.isEmpty()) {
                 for(String cell : cellReferences) {
                     cellEntry = new CellEntry(cell);
                     x = cellEntry.getX();
                     y = cellEntry.getY();
                     if(isIn(x,y)) {
-                        try {
-                            cellDepth(depth, x,y , 0);
-                        } catch(StackOverflowError infiniteCall){
-                            depth[x][y] = -1;
+                        if(Objects.equals(givenCellEntry.toString(), cell)) {
+                            current_depth=-1;
+                            break;
                         }
-
+                        try {
+                            cellDepth(depth, x, y, 0);
+                        } catch (StackOverflowError infiniteCall) {
+                            depth[x][y] = -1;
+                            table[x][y].setType(Ex2Utils.ERR_CYCLE_FORM);
+                            current_depth = -1;
+                            maxDepth = 0;
+                            break;
+                        }
                         if(depth[x][y] == -1) {
                             current_depth = -1;
                             maxDepth = 0;
@@ -133,8 +159,10 @@ public class Ex2Sheet implements Sheet {
                             maxDepth = depth[x][y];
                         }
                     }
-                }
             }
+
+            }
+
         }
         depth[i][j] = current_depth + maxDepth;
     }
@@ -169,7 +197,9 @@ public class Ex2Sheet implements Sheet {
 
         /////////////////////
     }
-
+    /*
+        In my implemention String eval is being called only when there is no cycle. (calling it inside void eval after checking depth)
+     */
     @Override
     public String eval(int x, int y) {
         String ans = null;
@@ -178,42 +208,51 @@ public class Ex2Sheet implements Sheet {
         ArrayList<String> cellsInFormula = new ArrayList<String>();
         double res;
         // maybe useful
+        String cellData;
         CellEntry current;
         int validX , validY;
+        int type = table[x][y].getType();
         // ---
-        if(ans != null && table[x][y].isForm(ans)) {
+        if(ans != null && type == 3) {
             // move that to isValid
-            for(String index: CellEntry.indexs) {
-                if(ans.contains(index)) {
-                    cellsInFormula.add(index);
-                }
-            }
-            if(cellsInFormula.isEmpty()) {
-                int type = table[x][y].getType();
-                if(type==3) {
-                    res = table[x][y].computeForm(ans);
-                    ans = Double.toString(res);
-                }
-            } else {
+            cellsInFormula = cellReferencesInForm(ans);
+             if(!cellsInFormula.isEmpty()){
                 for(String cell : cellsInFormula) {
-                    /* current = new CellEntry(cell);
-                    / validX = current.getX();
-                    / validY = current.getY();
-                    / if(isIn(validX, validY))
+                    current = new CellEntry(cell);
+                    validX = current.getX();
+                    validY = current.getY();
+                    if(isIn(validX, validY))
                       {
-                       celldata = eval(table[x][y].toString)
-                       if(table[x][y].isText(celldata)) {
-                         ans = Error formula
-                       } else {
-                         ans.replace(cell, celldata);
-                       }
+                       cellData = table[validX][validY].toString();
+                       switch(table[validX][validY].getType()) {
 
-                      } else {
-                            error formula
-                      }
-                    */
+                           case Ex2Utils.FORM:
+                               cellData = eval(validX,validY);
+                               // update the specific cell after eval
+                               table[validX][validY].setData(cellData);
+                               ans = ans.replace(cell, cellData);
+                               break;
+                           case Ex2Utils.NUMBER:
+                               ans = ans.replace(cell, cellData);
+                               break;
+                           default:
+                               ans = Ex2Utils.ERR_FORM;
+                               break;
+                       }
+                    } else {
+                        ans = Ex2Utils.ERR_FORM;
+                    }
+
                 }
             }
+
+            if(!ans.equals(Ex2Utils.ERR_FORM)) {
+                ans = Double.toString(table[x][y].computeForm(ans));
+                table[x][y].setData(ans);
+            }
+        }
+        if(type == Ex2Utils.ERR_FORM_FORMAT) {
+            ans = Ex2Utils.ERR_FORM;
         }
         /////////////////////
         return ans;

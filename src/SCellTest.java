@@ -5,7 +5,7 @@ public class SCellTest {
     @Test
     void testNumber() {
         SCell[] good = {
-                new SCell("2"),
+                new SCell("2.0"),
                 new SCell("5"),
                 new SCell("10"),
                 new SCell("=-11"),
@@ -16,7 +16,7 @@ public class SCellTest {
                 new SCell("aa"),
                 new SCell("-a"),
                 new SCell(""),
-                new SCell("9d")
+                new SCell("9s")
         };
         for(SCell cell : good) {
             assertTrue(cell.isNumber(cell.getData()));
@@ -79,15 +79,17 @@ public class SCellTest {
     @Test
     void testComputeForm() {
         SCell[] formulas = {
+                new SCell("=1+2"),
                 new SCell("=3+4+(5*6)"),
                 new SCell("=3+4-(5*6)"),
                 new SCell("=3/3 - 1")
         };
         int index = 0;
-        double[] wantedResults ={37, -23, 0};
+        double currentResult;
+        double[] wantedResults ={3, 37, -23, 0};
         for(SCell formula : formulas) {
-            formula.calcForm();
-            assertEquals(formula.getValue(), wantedResults[index]);
+            currentResult = formula.computeForm(formula.getData());
+            assertEquals(currentResult, wantedResults[index]);
             index++;
         }
     }

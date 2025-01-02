@@ -44,4 +44,6 @@ public interface Cell {
     public boolean isForm(String form);
 
     public double computeForm(String form);
+
+    public boolean isText(String text);
 }

@@ -43,14 +43,17 @@ public class SCell implements Cell {
 
     @Override
     public int getType() {
+        if(type == Ex2Utils.ERR_CYCLE_FORM) {
+            return type;
+        }
         if(isNumber(line)) {
-            type = Ex2Utils.NUMBER;
+            this.type = Ex2Utils.NUMBER;
         } else if(isForm(line)) {
-            type = Ex2Utils.FORM;
+            this.type = Ex2Utils.FORM;
         } else if(isText(line)) {
-            type = Ex2Utils.TEXT;
+            this.type = Ex2Utils.TEXT;
         }  else {
-            type = Ex2Utils.ERR_FORM_FORMAT;
+            this.type = Ex2Utils.ERR_FORM_FORMAT;
             this.line = Ex2Utils.ERR_FORM;
         }
         return type;
@@ -76,26 +79,13 @@ public class SCell implements Cell {
      */
     public boolean isNumber(String text) {
         boolean ans = true;
-        int i = 0;
-        int charInAscii;
-        if(text.isEmpty()) {ans = false;}
-        // check if it has the negative sign or starts with =
         if(text.startsWith("=")) {
-            i++;
-            // text.length()>1 makes sure that we won't get out of bound
-            if(text.length()>1&&text.charAt(i) == '-') {
-                i++;
-            }
+            text = text.substring(1);
         }
-        if(text.startsWith("-")) {
-            i++;
-            if(i>=text.length()) {ans =false;}
-        }
-        for(i=i; i<text.length(); i++) {
-            charInAscii = (int) text.charAt(i);
-            if(!(charInAscii>47 && charInAscii<58)) {
-                ans=false;
-            }
+        try {
+            Double.parseDouble(text);
+        } catch (NumberFormatException e) {
+            ans = false;
         }
         return ans;
     }
@@ -179,9 +169,10 @@ public class SCell implements Cell {
         int currentOrder = 2, previousOrder = 2;
         boolean inParentheses=false, isCurrentNotOperator;
         char current;
+        String operators = "+-*/";
         for(int i=0; i<form.length(); i++) {
             current = form.charAt(i);
-            isCurrentNotOperator = Character.isDigit(current) || Character.isLetter(current) ;
+            isCurrentNotOperator = operators.indexOf(current) == -1;
             if(current == '(') {
                 inParentheses = true;
                 currentOrder = 2;
@@ -219,34 +210,39 @@ public class SCell implements Cell {
                 res = a - b;
                 break;
             default:
-                res = 0;
+                res =0;
                 break;
         }
         return res;
     }
     public double computeForm(String form) {
-        double res = 0;
+        double res;
+        if(form.startsWith("=")){
+            form = form.substring(1);
+        }
+
         String part1 , part2;
         int operator_index;
         char operator;
         try {
-            if(form.startsWith("(")) {
-                form = form.substring(1);
+            try {
+                if (form.startsWith("(")) {
+                    form = form.substring(1);
+                }
+                if (form.endsWith(")")) {
+                    form = form.substring(0, form.length() - 1);
+                }
+                res = Double.parseDouble(form);
+            } catch (NumberFormatException e) {
+                operator_index = indexOfMainOp(form);
+                operator = form.charAt(operator_index);
+                part1 = form.substring(0, operator_index);
+                part2 = form.substring(operator_index + 1).trim();
+                res = calc(computeForm(part1), operator, computeForm(part2));
+
             }
-            if(form.endsWith(")")) {
-                form = form.substring(0, form.length()-1);
-            }
-            res = Double.parseDouble(form);
-        } catch(NumberFormatException e) {
-            operator_index = indexOfMainOp(form);
-            operator = form.charAt(operator_index);
-            part1 = form.substring(0, operator_index);
-            part2 = form.substring(operator_index+1).trim();
-
-
-            res = calc(computeForm(part1), operator  ,computeForm(part2));
-
-
+        } catch (StringIndexOutOfBoundsException error) {
+            res = Ex2Utils.ERR;
         }
         return res;
     }
