@@ -46,4 +46,5 @@ public interface Cell {
     public double computeForm(String form);
 
     public boolean isText(String text);
+    public void saveFormula();
 }

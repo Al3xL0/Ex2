@@ -5,14 +5,15 @@ public class SCell implements Cell {
     private int type;
     // Add your code here
     private double value;
-
+    private String originalLine;
     private int order;
 
 
     public SCell(String s) {
-        // Add your code here
+        // Add your code here;
+        originalLine=s;
         setData(s);
-
+        updateType();
 
     }
 
@@ -27,22 +28,25 @@ public class SCell implements Cell {
     //@Override
     @Override
     public String toString() {
-        return getData();
+        return line;
     }
 
     @Override
     public void setData(String s) {
         // Add your code here
+
         line = s;
+
         /////////////////////
+    }
+    public void saveFormula() {
+        this.originalLine = line;
     }
     @Override
     public String getData() {
-        return line;
+        return originalLine;
     }
-
-    @Override
-    public int getType() {
+    private int updateType() {
         if(type == Ex2Utils.ERR_CYCLE_FORM) {
             return type;
         }
@@ -56,6 +60,11 @@ public class SCell implements Cell {
             this.type = Ex2Utils.ERR_FORM_FORMAT;
             this.line = Ex2Utils.ERR_FORM;
         }
+        return type;
+    }
+    @Override
+    public int getType() {
+
         return type;
     }
 
@@ -79,9 +88,6 @@ public class SCell implements Cell {
      */
     public boolean isNumber(String text) {
         boolean ans = true;
-        if(text.startsWith("=")) {
-            text = text.substring(1);
-        }
         try {
             Double.parseDouble(text);
         } catch (NumberFormatException e) {

@@ -91,4 +91,32 @@ public class Ex2SheetTest {
             assertArrayEquals(wantedDataAfterEval[i], actualData[i], "Row " + i + " did not match");
         }
     }
+    @Test
+    void testEval() {
+        Ex2Sheet sheet = new Ex2Sheet(2,3);
+        String[][] dataForSpreadSheet = {
+                {"=A0", "=A0",  "=B0"},
+                {"3", "=3+B0", "hey"}
+        };
+        String[][] wantedData = {
+                {Ex2Utils.ERR_CYCLE, Ex2Utils.ERR_CYCLE,  "3.0"},
+                {"3", "6.0", "hey"}
+        };
+        String[][] res = new String[2][3];
+        for(int i=0; i<dataForSpreadSheet.length; i++) {
+            for (int j=0; j<dataForSpreadSheet[i].length; j++) {
+                sheet.set(i,j,dataForSpreadSheet[i][j]);
+            }
+        }
+        sheet.eval();
+        for(int i=0; i<dataForSpreadSheet.length; i++) {
+            for (int j=0; j<dataForSpreadSheet[i].length; j++) {
+                res[i][j] = sheet.get(i,j).getData();
+            }
+            System.out.println("Row " + i + ": " + Arrays.toString(res[i]));
+        }
+        for (int i = 0; i < res.length; i++) {
+            assertArrayEquals(wantedData[i], res[i], "Row " + i + " did not match");
+        }
+    }
 }

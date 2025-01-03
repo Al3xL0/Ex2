@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 // Add your documentation below:
 
 public class Ex2Sheet implements Sheet {
@@ -82,6 +83,7 @@ public class Ex2Sheet implements Sheet {
         String res;
         for(int i=0; i<width(); i++){
             for(int j=0; j<height(); j++){
+                table[i][j].saveFormula();
                 if(dd[i][j] != -1) {
                     res = eval(i,j);
                     table[i][j].setData(res);
@@ -104,12 +106,17 @@ public class Ex2Sheet implements Sheet {
         return ans;
     }
     private ArrayList<String> cellReferencesInForm(String form) {
-        String regex = "[A-Z]+[0-9]+";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(form);
         ArrayList<String> cellReferences = new ArrayList<>();
-        while (matcher.find()) {
-            cellReferences.add(matcher.group()); // Add matched reference to the list
+        try {
+            String regex = "[A-Z]+[0-9]+";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(form);
+            while (matcher.find()) {
+                cellReferences.add(matcher.group()); // Add matched reference to the list
+            }
+        } catch (PatternSyntaxException e) {
+            // Handle the exception gracefully, maybe log it
+            System.err.println("PatternSyntaxException: " + e.getMessage());
         }
         return cellReferences;
     }
@@ -118,12 +125,11 @@ public class Ex2Sheet implements Sheet {
 
         int type = -1;
         if(depth[i][j] != -1) {type = currentCell.getType();}
-        String currentData = currentCell.getData(), regex;
+        String currentData = currentCell.toString();
         CellEntry cellEntry;
         CellEntry givenCellEntry = new CellEntry(i,j);
         int x,y, maxDepth = 0;
-        Pattern pattern;
-        Matcher matcher;
+
         if(type == 3) {
             current_depth++;
 
@@ -162,9 +168,11 @@ public class Ex2Sheet implements Sheet {
             }
 
             }
-
+            depth[i][j] = current_depth + maxDepth;
+        } else if(type == -1) {
+            depth[i][j] = -1;
         }
-        depth[i][j] = current_depth + maxDepth;
+
     }
 
     @Override
@@ -177,6 +185,7 @@ public class Ex2Sheet implements Sheet {
                 if(ans[i][j] == 0) {
                     cellDepth(ans,i,j,0);
                 }
+
             }
         }
         // ///////////////////

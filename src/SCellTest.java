@@ -8,7 +8,7 @@ public class SCellTest {
                 new SCell("2.0"),
                 new SCell("5"),
                 new SCell("10"),
-                new SCell("=-11"),
+                new SCell("-11"),
                 new SCell("-18")
         };
         SCell[] bad = {
@@ -51,7 +51,7 @@ public class SCellTest {
     @Test
     void testIsForm() {
         SCell[] good = {
-                new SCell("=((0))"),
+                new SCell("=0"),
                 new SCell("=(23)+2+1+(1+2)"),
                 new SCell("=(11)"),
                 new SCell("=(1)+1"),
