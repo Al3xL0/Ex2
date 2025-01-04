@@ -111,7 +111,7 @@ public class Ex2SheetTest {
         sheet.eval();
         for(int i=0; i<dataForSpreadSheet.length; i++) {
             for (int j=0; j<dataForSpreadSheet[i].length; j++) {
-                res[i][j] = sheet.get(i,j).getData();
+                res[i][j] = sheet.get(i,j).toString();
             }
             System.out.println("Row " + i + ": " + Arrays.toString(res[i]));
         }

@@ -1,6 +1,10 @@
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -195,7 +199,43 @@ public class Ex2Sheet implements Sheet {
 
     @Override
     public void load(String fileName) throws IOException {
-        // Add your code here
+
+        // clean table
+        for(int i=0; i<width(); i++) {
+            for(int j=0; j<height(); j++) {
+                // reset the original formula + the current data
+                table[i][j].setData("");
+                table[i][j].saveFormula();
+            }
+        }
+        //load file
+        File file = new File(fileName);
+        Scanner scanner = new Scanner(file);
+        ArrayList<String> lines = new ArrayList<String>();
+        String[] splitLine;
+        String form;
+        int x,y;
+        while(scanner.hasNextLine()) {
+            lines.add(scanner.nextLine());
+        }
+        scanner.close();
+        for(int i = 1; i<lines.size(); i++) {
+            splitLine = lines.get(i).split(",");
+            if(splitLine.length>=3) {
+                try {
+                    x = Integer.parseInt(splitLine[0]);
+                    y = Integer.parseInt(splitLine[1]);
+                    form = splitLine[2];
+                    CellEntry cellEntry = new CellEntry(x,y);
+                    if(cellEntry.isValid() && isIn(x,y)) {
+                        table[x][y].setData(form);
+                    }
+                } catch (NumberFormatException e) {
+
+                }
+            }
+        }
+        eval();
 
         /////////////////////
     }
@@ -203,7 +243,22 @@ public class Ex2Sheet implements Sheet {
     @Override
     public void save(String fileName) throws IOException {
         // Add your code here
-
+        String currentLine;
+        File file = new File(fileName);
+        if(!file.exists()) {
+            file.createNewFile();
+        }
+        FileWriter fileWriter = new FileWriter(file);
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        for(int i=0; i< width(); i++) {
+            for(int j=0; j<height(); j++) {
+                if(!table[i][j].getData().isEmpty()) {
+                    currentLine = i + "," + j + "," + table[i][j].getData();
+                    printWriter.println(currentLine);
+                }
+            }
+        }
+        printWriter.close();
         /////////////////////
     }
     /*

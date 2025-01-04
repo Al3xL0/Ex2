@@ -145,7 +145,7 @@ public class SCell implements Cell {
         if(form.isEmpty()){ans=false; return ans;}
         if(!form.startsWith("=")){ans=false; return ans;}
         form = form.substring(1);
-
+        if(form.startsWith("-")) { form = form.substring(1);}
         String[] partsOfForm = form.split("[+\\-*/]");
         String[] validPartsOfForm = new String[partsOfForm.length];
 
