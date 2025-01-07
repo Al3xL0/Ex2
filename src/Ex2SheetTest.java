@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,5 +119,15 @@ public class Ex2SheetTest {
         for (int i = 0; i < res.length; i++) {
             assertArrayEquals(wantedData[i], res[i], "Row " + i + " did not match");
         }
+    }
+    @Test
+    void load() throws IOException {
+        Ex2Sheet sheet = new Ex2Sheet(Ex2Utils.WIDTH, Ex2Utils.HEIGHT);
+        sheet.load("src/test.txt");
+
+        assertEquals("10", sheet.value(0, 0));
+        assertEquals("20.0", sheet.value(0, 1));
+        assertEquals("5", sheet.value(1, 0));
+        assertEquals("30.0", sheet.value(1, 1));
     }
 }

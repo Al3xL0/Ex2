@@ -9,14 +9,16 @@ public class SCellTest {
                 new SCell("5"),
                 new SCell("10"),
                 new SCell("-11"),
-                new SCell("-18")
+                new SCell("-18"),
+                new SCell("-1.5009")
         };
         SCell[] bad = {
                 new SCell("%"),
                 new SCell("aa"),
                 new SCell("-a"),
                 new SCell(""),
-                new SCell("9s")
+                new SCell("9s"),
+                new SCell("1.1.1")
         };
         for(SCell cell : good) {
             assertTrue(cell.isNumber(cell.getData()));
@@ -57,7 +59,8 @@ public class SCellTest {
                 new SCell("=(1)+1"),
                 new SCell("=(1+2)*((3))-1"),
                 new SCell("=a0+b0"),
-                new SCell("=-1")
+                new SCell("=-1"),
+                new SCell("=-1.1+2.5")
         };
         SCell[] bad = {
                 new SCell("=a"),

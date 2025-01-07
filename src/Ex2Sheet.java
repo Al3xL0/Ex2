@@ -87,7 +87,10 @@ public class Ex2Sheet implements Sheet {
         String res;
         for(int i=0; i<width(); i++){
             for(int j=0; j<height(); j++){
-                table[i][j].saveFormula();
+                if(table[i][j].toString() == table[i][j].getData()) {
+                    table[i][j].saveFormula();
+                }
+
                 if(dd[i][j] != -1) {
                     res = eval(i,j);
                     table[i][j].setData(res);
@@ -176,7 +179,7 @@ public class Ex2Sheet implements Sheet {
         } else if(type == -1) {
             depth[i][j] = -1;
         }
-
+        table[i][j].setOrder(depth[i][j]);
     }
 
     @Override
@@ -206,6 +209,7 @@ public class Ex2Sheet implements Sheet {
                 // reset the original formula + the current data
                 table[i][j].setData("");
                 table[i][j].saveFormula();
+                table[i][j].setType(0);
             }
         }
         //load file
@@ -229,6 +233,9 @@ public class Ex2Sheet implements Sheet {
                     CellEntry cellEntry = new CellEntry(x,y);
                     if(cellEntry.isValid() && isIn(x,y)) {
                         table[x][y].setData(form);
+                        table[x][y].saveFormula();
+                        int type = table[x][y].updateType();
+                        table[x][y].setType(type);
                     }
                 } catch (NumberFormatException e) {
 
@@ -250,6 +257,7 @@ public class Ex2Sheet implements Sheet {
         }
         FileWriter fileWriter = new FileWriter(file);
         PrintWriter printWriter = new PrintWriter(fileWriter);
+        printWriter.println("I2CS ArielU: SpreadSheet (Ex2) assignment - this line should be ignored");
         for(int i=0; i< width(); i++) {
             for(int j=0; j<height(); j++) {
                 if(!table[i][j].getData().isEmpty()) {

@@ -1,0 +1,5 @@
+I2CS ArielU: SpreadSheet (Ex2) assignment - this line should be ignored
+0,0,10
+0,1,=A0*2
+1,0,5
+1,1,=A1+A0

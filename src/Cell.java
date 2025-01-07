@@ -47,4 +47,5 @@ public interface Cell {
 
     public boolean isText(String text);
     public void saveFormula();
+    public int updateType();
 }

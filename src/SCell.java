@@ -14,7 +14,7 @@ public class SCell implements Cell {
         originalLine=s;
         setData(s);
         updateType();
-
+        this.order = 0;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class SCell implements Cell {
     public String getData() {
         return originalLine;
     }
-    private int updateType() {
+    public int updateType() {
         if(type == Ex2Utils.ERR_CYCLE_FORM) {
             return type;
         }
@@ -252,12 +252,5 @@ public class SCell implements Cell {
         }
         return res;
     }
-    // a protection layer to computeForm, makes sure that the value that passed into the function is a formula
-    public void calcForm() {
-        if(isForm(this.line)) {
-            // assign the result to value.
-            this.value = computeForm(this.line.substring(1));
-            this.line = Double.toString(value);
-        }
-    }
+
 }
