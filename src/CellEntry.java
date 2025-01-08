@@ -8,7 +8,9 @@ public class CellEntry  implements Index2D {
     public CellEntry(String entry){
         this.indexOfCell = entry.toUpperCase();
     }
+
     public CellEntry(int x, int y) {
+        // convert a coordinates to cell name
         this.indexOfCell = convertX(x) + convertY(y);
     }
     @Override
@@ -62,6 +64,12 @@ public class CellEntry  implements Index2D {
         return indexList;
     }
 
+    /**
+     * converts to String the assci value of num + 'A' if num is between 0 and 26
+     * otherwise returns null
+     * @param num
+     * @return character between A to Z or null if num is not between 0 and 25
+     */
     private String convertX(int num) {
         if (num >= 0 && num < 26) {
             return Character.toString((char) ('A' + num)); // Convert 0-25 to 'A'-'Z'
@@ -69,6 +77,12 @@ public class CellEntry  implements Index2D {
 
         return null;
     }
+
+    /**
+     * converts given number to string
+     * @param num
+     * @return string value of num
+     */
     private String convertY(int num) {
         return String.valueOf(num);
     }

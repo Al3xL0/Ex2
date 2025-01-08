@@ -13,13 +13,15 @@ import java.util.regex.PatternSyntaxException;
 public class Ex2Sheet implements Sheet {
     private Cell[][] table;
     // Add your code here
-
+    private int[][] isEvaluating;
     // ///////////////////
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
+        isEvaluating = new int[x][y]; // Initialize the evaluation state array
         for(int i=0;i<x;i=i+1) {
             for(int j=0;j<y;j=j+1) {
                 table[i][j] = new SCell("");
+                isEvaluating[i][j] = 0;  // Mark all cells as not being evaluated
             }
         }
         eval();
@@ -80,7 +82,8 @@ public class Ex2Sheet implements Sheet {
             double number = Double.parseDouble(s);
             s = String.format("%.1f", number);
         }
-        c.setData(s);
+        table[x][y].setData(s);
+        table[x][y].saveFormula();
         /////////////////////
     }
     @Override
@@ -94,7 +97,7 @@ public class Ex2Sheet implements Sheet {
                     table[i][j].saveFormula();
                 }
 
-                if(dd[i][j] != -1) {
+                if(dd[i][j] != -1 && table[i][j].getOrder() !=-1) {
                     res = eval(i,j);
                     table[i][j].setData(res);
                     table[i][j].getType();
@@ -111,7 +114,7 @@ public class Ex2Sheet implements Sheet {
     public boolean isIn(int xx, int yy) {
         boolean ans = xx>=0 && yy>=0;
         // Add your code here
-        ans = ans && (xx<=width() && yy<= height());
+        ans = ans && (xx<=width()-1 && yy<= height()-1);
         /////////////////////
         return ans;
     }
@@ -148,8 +151,11 @@ public class Ex2Sheet implements Sheet {
         Cell currentCell = table[i][j];
 
         int type = -1;
-        if(depth[i][j] != -1) {type = currentCell.getType();}
-        String currentData = currentCell.toString();
+        if(depth[i][j] != -1) {
+            table[i][j].updateType();
+            type = currentCell.getType();
+        }
+        String currentData = currentCell.getData();
         CellEntry cellEntry;
         CellEntry givenCellEntry = new CellEntry(i,j);
         int x,y, maxDepth = 0;
@@ -166,6 +172,9 @@ public class Ex2Sheet implements Sheet {
                     cellEntry = new CellEntry(cell);
                     x = cellEntry.getX();
                     y = cellEntry.getY();
+                    if(cell.equals(Ex2Utils.ERR_CYCLE)) {
+                        depth[i][j] = Ex2Utils.ERR_CYCLE_FORM;
+                    }
                     if(isIn(x,y)) {
                         if(Objects.equals(givenCellEntry.toString(), cell)) {
                             current_depth=-1;
@@ -292,27 +301,46 @@ public class Ex2Sheet implements Sheet {
     @Override
     public String eval(int x, int y) {
         String ans = null;
-        if(get(x,y)!=null) {ans = get(x,y).toString();}
+        if(get(x,y)!=null) {ans = get(x,y).getData();}
         // Add your code here
+        // If the cell is already being evaluated, return an error (cycle detected)
+        if (isEvaluating[x][y] == 1) {
+            table[x][y].setType(Ex2Utils.ERR_CYCLE_FORM);
+            table[x][y].setOrder(-1);
+            return Ex2Utils.ERR_CYCLE;
+        }
+
+        // Mark the cell as currently being evaluated
+        isEvaluating[x][y] = 1;
         ArrayList<String> cellsInFormula = new ArrayList<String>();
         double res;
         // maybe useful
         String cellData;
         CellEntry current;
-        int validX , validY;
+        int validX = -1 , validY = -1;
         int type = table[x][y].getType();
+        CellEntry wantedCellEntry = new CellEntry(x,y);
         // ---
         if(ans != null && type == 3) {
             // move that to isValid
             cellsInFormula = cellReferencesInForm(ans);
              if(!cellsInFormula.isEmpty()){
                 for(String cell : cellsInFormula) {
+                    if(wantedCellEntry.toString() == cell) {
+                        ans= Ex2Utils.ERR_CYCLE;
+                        table[x][y].setType(Ex2Utils.ERR_CYCLE_FORM);
+                        break;
+                    }
                     current = new CellEntry(cell);
-                    validX = current.getX();
-                    validY = current.getY();
+                    if(current.isValid()) {
+                        validX = current.getX();
+                        validY = current.getY();
+                    } else {
+                        ans = Ex2Utils.ERR_FORM;
+                    }
                     if(isIn(validX, validY))
                       {
-                       cellData = table[validX][validY].toString();
+                       cellData = table[validX][validY].getData();
                        switch(table[validX][validY].getType()) {
 
                            case Ex2Utils.FORM:
@@ -335,7 +363,7 @@ public class Ex2Sheet implements Sheet {
                 }
             }
 
-            if(!ans.equals(Ex2Utils.ERR_FORM)) {
+            if(!ans.equals(Ex2Utils.ERR_FORM) && !ans.equals(Ex2Utils.ERR_CYCLE)) {
                 ans = Double.toString(table[x][y].computeForm(ans));
                 table[x][y].setData(ans);
             }
@@ -343,6 +371,8 @@ public class Ex2Sheet implements Sheet {
         if(type == Ex2Utils.ERR_FORM_FORMAT) {
             ans = Ex2Utils.ERR_FORM;
         }
+        // Mark the cell as not being evaluated after the recursion
+        isEvaluating[x][y] = 0;
         /////////////////////
         return ans;
         }

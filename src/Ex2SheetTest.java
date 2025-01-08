@@ -8,7 +8,7 @@ public class Ex2SheetTest {
     @Test
     public void isInTest() {
         Ex2Sheet sheet = new Ex2Sheet(26, 99);
-        assertTrue(sheet.isIn(1, 99));
+        assertTrue(sheet.isIn(1, 98));
         assertTrue(sheet.isIn(25, 1));
         assertTrue(sheet.isIn(0, 77));
         assertTrue(sheet.isIn(1, 23));
@@ -122,6 +122,8 @@ public class Ex2SheetTest {
         assertEquals(Ex2Utils.ERR_CYCLE, sheet.get(0,0).toString());
     }
 
+
+
     @Test
     void load() throws IOException {
         Ex2Sheet sheet = new Ex2Sheet(Ex2Utils.WIDTH, Ex2Utils.HEIGHT);
@@ -150,7 +152,7 @@ public class Ex2SheetTest {
 
         assertEquals("3.0", loadedSheet.value(0, 0));
         assertEquals(Ex2Utils.ERR_CYCLE, loadedSheet.value(0, 1));
-        assertEquals("5", loadedSheet.value(1, 0));
+        assertEquals("5.0", loadedSheet.value(1, 0));
         assertEquals("10.0", loadedSheet.value(1, 1));
 
         // Additional save/load check with empty cells

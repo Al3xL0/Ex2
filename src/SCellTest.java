@@ -104,7 +104,8 @@ public class SCellTest {
                 new SCell("=(1+2"),
                 new SCell("=2+3)"),
                 new SCell("=a+b+"),
-                new SCell("=*2+3")
+                new SCell("=*2+3"),
+                new SCell("=3=3=3=3")
         };
         for(SCell cell : good) {
             assertTrue(cell.isForm(cell.getData()));
