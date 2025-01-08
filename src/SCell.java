@@ -10,7 +10,6 @@ public class SCell implements Cell {
 
 
     public SCell(String s) {
-        // Add your code here;
         originalLine=s;
         setData(s);
         updateType();
@@ -19,10 +18,9 @@ public class SCell implements Cell {
 
     @Override
     public int getOrder() {
-        // Add your code here
 
         return order;
-        // ///////////////////
+
     }
 
     //@Override
@@ -33,11 +31,7 @@ public class SCell implements Cell {
 
     @Override
     public void setData(String s) {
-        // Add your code here
-
         line = s;
-
-        /////////////////////
     }
     public void saveFormula() {
         this.originalLine = line;
@@ -83,8 +77,11 @@ public class SCell implements Cell {
         order = t;
     }
 
-    /*
-
+    /**
+     * Checks if the given string represents a valid number.
+     *
+     * @param text The string to check.
+     * @return true if the string can be parsed as a double, false otherwise.
      */
     public boolean isNumber(String text) {
         boolean ans = true;
@@ -108,6 +105,15 @@ public class SCell implements Cell {
         return ans;
     }
 
+    /**
+     * Removes parentheses around a part of a mathematical expression.
+     * The method recursively strips parentheses only if they are not needed for
+     * defining the order of operations.
+     *
+     * @param arr The array of parts of the expression.
+     * @param i The index of the part to process.
+     * @return A string with parentheses removed.
+     */
     private String removeParentheses(String[] arr , int i ) {
         boolean leftParentheses, rightParentheses, wrappedByParentheses;
         leftParentheses = arr[i].startsWith("(");
@@ -169,7 +175,14 @@ public class SCell implements Cell {
         }
         return ans;
     }
-
+    /**
+     * Finds the index of the main operator in a mathematical expression.
+     * The main operator is the one that is the last to be applied according to
+     * operator precedence and parentheses.
+     *
+     * @param form The mathematical expression as a string.
+     * @return The index of the main operator in the string. If no operator is found, returns -1.
+     */
     private int indexOfMainOp(String form) {
         int index = -1;
         int currentOrder = 2, previousOrder = 2;

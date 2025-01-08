@@ -31,14 +31,12 @@ public class Ex2Sheet implements Sheet {
     @Override
     public String value(int x, int y) {
         String ans = Ex2Utils.EMPTY_CELL;
-        // Add your code here
 
         Cell c = get(x,y);
         if(c!=null) {
             ans = c.toString();
         }
 
-        /////////////////////
         return ans;
     }
 
@@ -112,6 +110,12 @@ public class Ex2Sheet implements Sheet {
         /////////////////////
         return ans;
     }
+    /**
+     * Returns a list of cell references found in the specified formula string.
+     *
+     * @param form the formula string to search for cell references.
+     * @return a list of cell references.
+     */
     private ArrayList<String> cellReferencesInForm(String form) {
         ArrayList<String> cellReferences = new ArrayList<>();
         try {
@@ -127,6 +131,14 @@ public class Ex2Sheet implements Sheet {
         }
         return cellReferences;
     }
+    /**
+     * Computes the depth of each cell in the spreadsheet recursively.
+     *
+     * @param depth the 2D array to store the depth of each cell.
+     * @param i the x-coordinate of the current cell.
+     * @param j the y-coordinate of the current cell.
+     * @param current_depth the current depth in the recursion.
+     */
     private void cellDepth(int[][] depth, int i, int j, int current_depth) {
         Cell currentCell = table[i][j];
 

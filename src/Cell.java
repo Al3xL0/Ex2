@@ -39,13 +39,38 @@ public interface Cell {
      */
     public void setOrder(int t);
 
-    // my functions
 
+
+    /**
+     *  Checks if the given string is a valid formula.
+     *  a vaild formula conations only cells and number, and start with "=".
+     *  example of valid formula : "=A0+1*(5/A1)"
+     * @param form the current cell data
+     * @return if is formula true, else false.
+     */
     public boolean isForm(String form);
 
+    /**
+     * computes the given formula
+     * @param form the current cell data
+     * @return the formula after computation
+     */
     public double computeForm(String form);
 
+    /**
+     * Checks if the given string is a number or formula, if it is neither assumes that it is text
+     * @param text the current cell data
+     * @return true if text, false if formula or number.
+     */
     public boolean isText(String text);
+
+    /**
+     * saves the original line before any computation
+     */
     public void saveFormula();
+    /**
+     * computes the type of this Cell
+     * @return the type of the cell after updating it
+     **/
     public int updateType();
 }

@@ -130,4 +130,22 @@ public class Ex2SheetTest {
         assertEquals("5", sheet.value(1, 0));
         assertEquals("30.0", sheet.value(1, 1));
     }
+
+    @Test
+    void save() throws IOException {
+        Ex2Sheet sheet = new Ex2Sheet(2, 3);
+        sheet.set(0, 0, "=1+2");
+        sheet.set(0, 1, "=A1");
+        sheet.set(1, 0, "5");
+        sheet.set(1, 1, "=5+5");
+        sheet.save("src/savedTest.txt");
+
+        Ex2Sheet loadedSheet = new Ex2Sheet(2, 3);
+        loadedSheet.load("src/savedTest.txt");
+
+        assertEquals("3.0", loadedSheet.value(0, 0));
+        assertEquals(Ex2Utils.ERR_CYCLE, loadedSheet.value(0, 1));
+        assertEquals("5", loadedSheet.value(1, 0));
+        assertEquals("10.0", loadedSheet.value(1, 1));
+    }
 }
