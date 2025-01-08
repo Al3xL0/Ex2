@@ -1,5 +1,8 @@
 // Add your documentation below:
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class SCell implements Cell {
     private String line;
     private int type;
@@ -46,6 +49,9 @@ public class SCell implements Cell {
         }
         if(isNumber(line)) {
             this.type = Ex2Utils.NUMBER;
+            double d = Double.parseDouble(line);
+
+
         } else if(isForm(line)) {
             this.type = Ex2Utils.FORM;
         } else if(isText(line)) {
@@ -86,7 +92,8 @@ public class SCell implements Cell {
     public boolean isNumber(String text) {
         boolean ans = true;
         try {
-            Double.parseDouble(text);
+            double d = Double.parseDouble(text);
+
         } catch (NumberFormatException e) {
             ans = false;
         }
@@ -110,38 +117,23 @@ public class SCell implements Cell {
      * The method recursively strips parentheses only if they are not needed for
      * defining the order of operations.
      *
-     * @param arr The array of parts of the expression.
-     * @param i The index of the part to process.
-     * @return A string with parentheses removed.
+     * @param str The array of parts of the expression.
+     * @return An array of strings splitted by parentheses
      */
-    private String removeParentheses(String[] arr , int i ) {
-        boolean leftParentheses, rightParentheses, wrappedByParentheses;
-        leftParentheses = arr[i].startsWith("(");
-        rightParentheses = arr[i].endsWith(")");
-        String res = "";
-        if(i+1< arr.length ) {
-            wrappedByParentheses = arr[i+1].startsWith("(") && arr[i+1].endsWith(")");
-            if ( (!wrappedByParentheses) && leftParentheses && arr[i + 1].endsWith(")")) {
-                res = arr[i].substring(1);
+    private String[] removeParentheses(String str) {
+        int openParentheses = 0, closeParentheses = 0;
+        String[] res = new String[str.length()];
+        for(int i=0; i<str.length(); i++) {
+            if(str.charAt(i)=='('){
+                openParentheses++;
+            } else if(str.charAt(i)==')'){
+                closeParentheses++;
             }
         }
-
-        if(i-1 >= 0) {
-            wrappedByParentheses = arr[i-1].startsWith("(") && arr[i-1].endsWith(")");
-            if ((!wrappedByParentheses) && arr[i-1].startsWith("(") && rightParentheses) {
-                res = arr[i].substring(0, arr[i].length() - 1);
-            }
-        }
-        if(!leftParentheses && !rightParentheses) {
-            res = arr[i];
-        }
-        else if(leftParentheses && rightParentheses) {
-            res = arr[i].substring(1, arr[i].length()-1);
-        }
-        leftParentheses = res.startsWith("(");
-        rightParentheses = res.endsWith(")");
-        if(leftParentheses || rightParentheses ) {
-            res = removeParentheses(new String[]{res}, 0);
+        if(openParentheses == closeParentheses) {
+            res = str.split("[()]");
+        } else {
+            res[0] = "err";
         }
         return res;
     }
@@ -152,27 +144,60 @@ public class SCell implements Cell {
         if(!form.startsWith("=")){ans=false; return ans;}
         form = form.substring(1);
         if(form.startsWith("-")) { form = form.substring(1);}
-        String[] partsOfForm = form.split("[+\\-*/]");
-        String[] validPartsOfForm = new String[partsOfForm.length];
 
-        boolean leftParentheses, rightParentheses, wrappedByParentheses;
-        for(int i =0; i<partsOfForm.length; i++) {
-            validPartsOfForm[i] = removeParentheses(partsOfForm, i);
+        // Check for consecutive operators like ++, --, **, etc.
+        if (form.matches(".*[+\\-*/]{2,}.*")) {
+            ans = false;
+        }
 
-            if(validPartsOfForm[i] == null || validPartsOfForm[i].isEmpty()) {
+        String[] partsWitoutParentheses = removeParentheses(form);
+        partsWitoutParentheses = Arrays.stream(partsWitoutParentheses)
+                .filter(part -> part != null &&  !part.isEmpty())  // Remove empty strings
+               .toArray(String[]::new);
+        ArrayList<String> partsOfForm = new ArrayList<>();
+        for(int i = 0; i < partsWitoutParentheses.length; i++) {
+            String[] separatedByOps = partsWitoutParentheses[i].split("[+\\-*/]");
+            if(separatedByOps.length>0) {
+                if( i!=0 && separatedByOps[0].isEmpty()) {
+                    separatedByOps = Arrays.copyOfRange(separatedByOps, 1, separatedByOps.length);
+
+                }
+                for(String base : separatedByOps) {
+                    partsOfForm.add(base);
+                }
+            }
+
+        }
+        for (String part : partsOfForm) {
+            if(part == null || part.isEmpty()) {
                 ans=false;
                 break;
-            } else {
-                try {
-                    Double.parseDouble(validPartsOfForm[i]);
-                } catch(NumberFormatException e) {
-                    if(!CellEntry.indexs.contains(validPartsOfForm[i])) {
-                        ans =false;
-                        break;
-                    }
+            }
+            try {
+                Double.parseDouble(part);
+            }catch(NumberFormatException e) {
+                if (!CellEntry.indexs.contains(part)) {
+                    ans = false;
+                    break;
                 }
             }
         }
+        //for(int i =0; i<partsOfForm.length; i++) {
+
+           // if(validPartsOfForm[i] == null || validPartsOfForm[i].isEmpty()) {
+              //  ans=false;
+               // break;
+           // } else {
+                //try {
+                   // Double.parseDouble(validPartsOfForm[i]);
+              //  } catch(NumberFormatException e) {
+                   // if(!CellEntry.indexs.contains(validPartsOfForm[i])) {
+                      //  ans =false;
+                    //    break;
+                 //   }
+              //  }
+            //}
+        //}
         return ans;
     }
     /**
@@ -245,17 +270,15 @@ public class SCell implements Cell {
         char operator;
         try {
             try {
-                if (form.startsWith("(")) {
-                    form = form.substring(1);
-                }
-                if (form.endsWith(")")) {
-                    form = form.substring(0, form.length() - 1);
+                if (form.startsWith("(") && form.endsWith(")")) {
+                    form = form.substring(1, form.length() - 1);
                 }
                 res = Double.parseDouble(form);
             } catch (NumberFormatException e) {
                 operator_index = indexOfMainOp(form);
                 operator = form.charAt(operator_index);
                 part1 = form.substring(0, operator_index);
+                if(part1.isEmpty()) {part1 = "0";}
                 part2 = form.substring(operator_index + 1).trim();
                 res = calc(computeForm(part1), operator, computeForm(part2));
 

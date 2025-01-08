@@ -66,6 +66,7 @@ public class CellEntry  implements Index2D {
         if (num >= 0 && num < 26) {
             return Character.toString((char) ('A' + num)); // Convert 0-25 to 'A'-'Z'
         }
+
         return null;
     }
     private String convertY(int num) {

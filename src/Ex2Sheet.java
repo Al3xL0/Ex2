@@ -75,6 +75,11 @@ public class Ex2Sheet implements Sheet {
         Cell c = new SCell(s);
         table[x][y] = c;
         // Add your code here
+        table[x][y].updateType();
+        if(table[x][y].getType() == Ex2Utils.NUMBER) {
+            double number = Double.parseDouble(s);
+            s = String.format("%.1f", number);
+        }
         c.setData(s);
         /////////////////////
     }
