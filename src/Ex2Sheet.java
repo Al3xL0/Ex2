@@ -99,8 +99,8 @@ public class Ex2Sheet implements Sheet {
 
                 if(dd[i][j] != -1 && table[i][j].getOrder() !=-1) {
                     res = eval(i,j);
+
                     table[i][j].setData(res);
-                    table[i][j].getType();
                 } else {
                     table[i][j].setType(Ex2Utils.ERR_CYCLE_FORM);
                     table[i][j].setData(Ex2Utils.ERR_CYCLE);
@@ -318,6 +318,7 @@ public class Ex2Sheet implements Sheet {
         String cellData;
         CellEntry current;
         int validX = -1 , validY = -1;
+        table[x][y].updateType();
         int type = table[x][y].getType();
         CellEntry wantedCellEntry = new CellEntry(x,y);
         // ---

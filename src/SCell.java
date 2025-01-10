@@ -47,14 +47,14 @@ public class SCell implements Cell {
         if(type == Ex2Utils.ERR_CYCLE_FORM) {
             return type;
         }
-        if(isNumber(line)) {
+        if(isNumber(originalLine)) {
             this.type = Ex2Utils.NUMBER;
             double d = Double.parseDouble(line);
 
 
-        } else if(isForm(line)) {
+        } else if(isForm(originalLine)) {
             this.type = Ex2Utils.FORM;
-        } else if(isText(line)) {
+        } else if(isText(originalLine)) {
             this.type = Ex2Utils.TEXT;
         }  else {
             this.type = Ex2Utils.ERR_FORM_FORMAT;
