@@ -43,8 +43,8 @@ public interface Cell {
 
     /**
      *  Checks if the given string is a valid formula.
-     *  a vaild formula conations only cells and number, and start with "=".
-     *  example of valid formula : "=A0+1*(5/A1)"
+     *  a valid formula contains only cells and number, and starts with "=".
+     *  example of valid formula: "=A0+1*(5/A1)"
      * @param form the current cell data
      * @return if is formula true, else false.
      */

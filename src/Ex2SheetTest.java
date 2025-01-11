@@ -58,7 +58,7 @@ public class Ex2SheetTest {
         Ex2Sheet sheet = new Ex2Sheet(3, 4);
         String[][] dataForSpreadSheet = {
                 {"=1+2", "=A0", "=1+2", "hey"},
-                {"=A0", "=A0+A1", "=B1+B3", "=5*8"},
+                {"=A0", "=A0 + A1", "=B1+B3", "=5*8"},
                 {"=(1+2)+A0", "=B0+A0", "=B1+A0+C1", "=B3"}
         };
         String[][] wantedDataAfterEval = {

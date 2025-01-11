@@ -49,6 +49,10 @@ public class CellEntry  implements Index2D {
         return ans;
     }
 
+    /**
+     * create a new list of valid cell names and return it
+     * @return list which contains each valid entry
+     */
     private static ArrayList<String> create_indexs() {
         ArrayList<String> indexList = new ArrayList<String>();
         String current;

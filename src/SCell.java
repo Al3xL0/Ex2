@@ -1,13 +1,9 @@
-// Add your documentation below:
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SCell implements Cell {
     private String line;
     private int type;
-    // Add your code here
-    private double value;
     private String originalLine;
     private int order;
 
@@ -21,12 +17,12 @@ public class SCell implements Cell {
 
     @Override
     public int getOrder() {
-
+        // I chose to compute the natural order (aka depth) inside a function that I build Ex2Sheet.cellDepth instead
         return order;
 
     }
 
-    //@Override
+
     @Override
     public String toString() {
         return line;
@@ -36,28 +32,33 @@ public class SCell implements Cell {
     public void setData(String s) {
         line = s;
     }
+    // saves the original line before any computation
     public void saveFormula() {
         this.originalLine = line;
     }
+
     @Override
     public String getData() {
         return originalLine;
     }
+
+
     public int updateType() {
         if(type == Ex2Utils.ERR_CYCLE_FORM) {
             return type;
         }
         if(isNumber(originalLine)) {
             this.type = Ex2Utils.NUMBER;
-            double d = Double.parseDouble(line);
-
 
         } else if(isForm(originalLine)) {
+
             this.type = Ex2Utils.FORM;
         } else if(isText(originalLine)) {
+
             this.type = Ex2Utils.TEXT;
         }  else {
             this.type = Ex2Utils.ERR_FORM_FORMAT;
+            // update the data inside the cell according to the type
             this.line = Ex2Utils.ERR_FORM;
         }
         return type;
@@ -68,9 +69,6 @@ public class SCell implements Cell {
         return type;
     }
 
-    public double getValue() {
-        return value;
-    }
 
     @Override
     public void setType(int t) {
@@ -131,7 +129,7 @@ public class SCell implements Cell {
             }
         }
         if(openParentheses == closeParentheses) {
-            res = str.split("[()]");
+            res = str.split("[()]"); // splitting using regular expression
         } else {
             res[0] = "err";
         }
@@ -140,71 +138,58 @@ public class SCell implements Cell {
 
     public boolean isForm(String form) {
         boolean ans = true;
-        if(form.isEmpty()){ans=false; return ans;}
-        if(!form.startsWith("=")){ans=false; return ans;}
-        form = form.substring(1);
+        if(form.isEmpty()){ans=false;}
+        // if starts with "=" remove "="
+        if(form.startsWith("=")){form = form.substring(1);}
+        // otherwise it's an invalid formula
+        else  { ans=false;}
         if(form.startsWith("-")) { form = form.substring(1);}
-
+        // remove whitespaces
+        form = form.replaceAll("\\s", "");
         // Check for consecutive operators like ++, --, **, etc.
         if (form.matches(".*[+\\-*/]{2,}.*")) {
             ans = false;
         }
 
         String[] partsWitoutParentheses = removeParentheses(form);
+        // return the given array without null or empty parts.
         partsWitoutParentheses = Arrays.stream(partsWitoutParentheses)
-                .filter(part -> part != null &&  !part.isEmpty())  // Remove empty strings
+                .filter(part -> part != null &&  !part.isEmpty())
                .toArray(String[]::new);
         ArrayList<String> partsOfForm = new ArrayList<>();
-        for(int i = 0; i < partsWitoutParentheses.length; i++) {
-            String[] separatedByOps = partsWitoutParentheses[i].split("[+\\-*/]");
-            if(separatedByOps.length>0) {
-                if( i!=0 && separatedByOps[0].isEmpty()) {
-                    separatedByOps = Arrays.copyOfRange(separatedByOps, 1, separatedByOps.length);
+        if(ans) {
+            //  assign all the parts of the formula that are not parentheses or mathematical operators into partsOfForm
+            for (int i = 0; i < partsWitoutParentheses.length; i++) {
+                String[] separatedByOps = partsWitoutParentheses[i].split("[+\\-*/]");
+                if (separatedByOps.length > 0) {
+                    if (i != 0 && separatedByOps[0].isEmpty()) {
+                        separatedByOps = Arrays.copyOfRange(separatedByOps, 1, separatedByOps.length);
 
+                    }
+                    for (String base : separatedByOps) {
+                        partsOfForm.add(base);
+                    }
                 }
-                for(String base : separatedByOps) {
-                    partsOfForm.add(base);
-                }
+
             }
 
+            for (String part : partsOfForm) {
+                try {
+                    Double.parseDouble(part);
+                } catch (NumberFormatException e) {
+                    if (!CellEntry.indexs.contains(part)) {
+                        ans = false;
+                        break;
+                    }
+                }
+            }
         }
-        for (String part : partsOfForm) {
-            if(part == null || part.isEmpty()) {
-                ans=false;
-                break;
-            }
-            try {
-                Double.parseDouble(part);
-            }catch(NumberFormatException e) {
-                if (!CellEntry.indexs.contains(part)) {
-                    ans = false;
-                    break;
-                }
-            }
-        }
-        //for(int i =0; i<partsOfForm.length; i++) {
-
-           // if(validPartsOfForm[i] == null || validPartsOfForm[i].isEmpty()) {
-              //  ans=false;
-               // break;
-           // } else {
-                //try {
-                   // Double.parseDouble(validPartsOfForm[i]);
-              //  } catch(NumberFormatException e) {
-                   // if(!CellEntry.indexs.contains(validPartsOfForm[i])) {
-                      //  ans =false;
-                    //    break;
-                 //   }
-              //  }
-            //}
-        //}
         return ans;
     }
     /**
      * Finds the index of the main operator in a mathematical expression.
      * The main operator is the one that is the last to be applied according to
      * operator precedence and parentheses.
-     *
      * @param form The mathematical expression as a string.
      * @return The index of the main operator in the string. If no operator is found, returns -1.
      */
@@ -213,9 +198,11 @@ public class SCell implements Cell {
         int currentOrder = 2, previousOrder = 2;
         boolean inParentheses=false, isCurrentNotOperator;
         char current;
-        String operators = "+-*/";
+        // string with all the operators
+        String operators = "()+-*/";
         for(int i=0; i<form.length(); i++) {
             current = form.charAt(i);
+            // check if the current character is an operator based on if its part of the operators string
             isCurrentNotOperator = operators.indexOf(current) == -1;
             if(current == '(') {
                 inParentheses = true;
@@ -231,6 +218,7 @@ public class SCell implements Cell {
                     currentOrder = 0;
                 }
             }
+            // check what is the current order only if the current character is an operator
             if(!isCurrentNotOperator&& (currentOrder <= previousOrder)) {
                 previousOrder = currentOrder;
                 index = i;
@@ -238,6 +226,14 @@ public class SCell implements Cell {
         }
         return index;
     }
+
+    /**
+     * makes mathematical operation on two given numbers based on the chosen operator
+     * @param a first number
+     * @param operator the wanted operation
+     * @param b second number
+     * @return result of the operation
+     */
     private double calc(double a, char operator, double b) {
         double res;
         switch (operator) {
